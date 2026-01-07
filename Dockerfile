@@ -3,6 +3,7 @@ FROM ubuntu:latest
 LABEL org.opencontainers.image.source="https://github.com/cicybot/hello-ghcr" \
       org.opencontainers.image.title="Container says Meow!" \
       org.opencontainers.image.description="This container will meow at you."
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN RUN apt-get update && \
     apt-get install -y --no-install-recommends \
