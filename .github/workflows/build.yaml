@@ -31,6 +31,7 @@ jobs:
       - name: Tag container image
         run: |
           docker tag ubuntu-vnc ghcr.io/${{ github.repository_owner }}/ubuntu-vnc:latest
+          docker tag ubuntu-vnc ghcr.io/${{ github.repository_owner }}/ubuntu-vnc:1.0.1
 
       # Step 4: Login to GHCR
       - name: Docker login
@@ -43,6 +44,7 @@ jobs:
       - name: Push the container image
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/ubuntu-vnc:latest
+          docker push ghcr.io/${{ github.repository_owner }}/ubuntu-vnc:1.0.1
 
       # Step 6: Logout from GHCR
       - name: Docker logout
