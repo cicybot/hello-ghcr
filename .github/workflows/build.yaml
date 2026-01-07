@@ -1,4 +1,5 @@
 name: Meow Container
+
 on:
   push:
     branches:
@@ -18,62 +19,32 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
+      # Step 1: Checkout code
       - uses: actions/checkout@v6
+
+      # Step 2: Build the Docker image and tag it for GHCR
       - name: Build container image
         run: |
-          docker build --label org.opencontainers.image.revision=${{ github.sha }} --iidfile meow.id .
-          echo "MEOW_ID=$(cat meow.id)" >> ${GITHUB_ENV}
-      - name: Test container image
-        run: |
-          test "$(docker run --rm ${MEOW_ID})" = "Meow! =^.^="
-          test "$(docker run --rm ${MEOW_ID} 2)" = "Meow! Meow! =^.^="
-      - name: Show image information
-        run: |
-          docker image inspect ${MEOW_ID}
-      - name: Generate container tag(s) and name
-        run: |
-          TAGS=$(python3 tag-from-ref.py ${{ github.ref }})
-          echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
-          echo "CONTAINER_NAME=${{ github.repository_owner }}/hello-ghcr-meow" >> ${GITHUB_ENV}
+          docker build -t ubuntu-vnc .
+
+      # Step 3: Tag the image for GitHub Container Registry
       - name: Tag container image
-        if: ${{ env.TAGS }}
         run: |
-          for t in ${TAGS}; do
-              full_tag=ghcr.io/${CONTAINER_NAME}:${t}
-              docker tag ${MEOW_ID} ${full_tag}
-          done
-          echo "SCAN_REF=${full_tag}" >> ${GITHUB_ENV}
-      - name: Tag container image with temporary tag
-        if: ${{ ! env.TAGS }}
-        run: |
-          full_tag=ghcr.io/${CONTAINER_NAME}:${{ github.sha }}
-          docker tag ${MEOW_ID} ${full_tag}
-          echo "SCAN_REF=${full_tag}" >> ${GITHUB_ENV}
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: '${{ env.SCAN_REF }}'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: 'trivy-results.sarif'
+          docker tag ubuntu-vnc ghcr.io/${{ github.repository_owner }}/ubuntu-vnc:latest
+
+      # Step 4: Login to GHCR
       - name: Docker login
-        if: ${{ env.TAGS }}
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          echo ${GHCR_TOKEN} |
-          docker login ghcr.io -u ${{ github.repository_owner }}
-          --password-stdin
-      - name: Push the container image
-        if: ${{ env.TAGS }}
         run: |
-          for t in ${TAGS}; do
-              docker push ghcr.io/${CONTAINER_NAME}:${t}
-          done
+          echo $GHCR_TOKEN | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      # Step 5: Push image to GHCR
+      - name: Push the container image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/ubuntu-vnc:latest
+
+      # Step 6: Logout from GHCR
       - name: Docker logout
         if: always()
-        run: |
-          docker logout ghcr.io
+        run: docker logout ghcr.io
