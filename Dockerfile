@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN  apt-get update && \
     apt-get install -y --no-install-recommends \
-    ubuntu-desktop-minimal gnome-session gnome-shell ubuntu-session gnome-terminal   tigervnc-standalone-server netcat-openbsd curl x11-xserver-utils xauth dbus-x11 xorg xserver-xorg-core   xserver-xorg-input-all xserver-xorg-video-dummy x11-apps policykit-1 colord speech-dispatcher
+    sudo ubuntu-desktop-minimal gnome-session gnome-shell ubuntu-session gnome-terminal   tigervnc-standalone-server netcat-openbsd curl x11-xserver-utils xauth dbus-x11 xorg xserver-xorg-core   xserver-xorg-input-all xserver-xorg-video-dummy x11-apps policykit-1 colord speech-dispatcher
 
 
 # COPY meow.sh /
