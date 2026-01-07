@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.23.2
+FROM ubuntu-latest
 
 LABEL org.opencontainers.image.source="https://github.com/cicybot/hello-ghcr" \
       org.opencontainers.image.title="Container says Meow!" \
